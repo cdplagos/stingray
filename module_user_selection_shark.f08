@@ -48,7 +48,8 @@ subroutine assign_selection_function
       case('example');              selection_function => selection_example
       case('gama');                 selection_function => selection_gama
       case('devils');               selection_function => selection_devils
-      case('waves-g23');            selection_function => selection_waves_g23
+      case('waves-wide');           selection_function => selection_waves_wide
+      case('waves-deep');           selection_function => selection_waves_deep
       case('deep-optical');         selection_function => selection_deep_optical
       case('deep-optical_narrow');  selection_function => selection_deep_optical_narrow
       case('wallaby-micro');        selection_function => selection_wallaby_micro
@@ -216,9 +217,9 @@ end subroutine
 
 ! **********************************************************************************************************************************
 
-! WAVES G23 survey
+! WAVES-Wide survey all fields
 
-subroutine selection_waves_g23(pos,sam,sky,range,selected)
+subroutine selection_waves_wide(pos,sam,sky,range,selected)
 
    implicit none
    type(type_spherical),intent(in),optional     :: pos
@@ -233,11 +234,15 @@ subroutine selection_waves_g23(pos,sam,sky,range,selected)
    
    ! selection function
    select case (selection_type(pos,sam,sky,range,selected))
+
    case (return_position_range)
-      range%dc = (/0.0,2350.0/) ! [simulation length units, here Mpc/h]
-      range%ra = (/339.0,351.0/) ! [deg] range of right ascensions, bound to 0 to 360
-      range%dec = (/-35.0,-30.0/) ! [deg] range of declinations, bound to -90 to +90
+      range%dc = (/0.0,2274.4825/) ! [simulation length units, here Mpc/h] limit corresponding to z=1
+      range%ra = (/0,360/) ! [deg] range of right ascensions, bound to 0 to 360
+      range%dec = (/-36,4/) ! [deg] range of declinations, bound to -90 to +90
    case (select_by_pos)
+      selected = ((pos%ra>=157.25).and.(pos%ra<=225.0).and.(pos%dec>= -3.95).and.(pos%dec<= 3.95)).or. & ! field WD_wide_north
+       & ((pos%ra>=330.0).and.(pos%dec>= -35.6).and.(pos%dec<= -27.00)).or. & ! field WD_wide_south_1
+       & ((pos%ra<=51.6).and.(pos%dec>= -35.6).and.(pos%dec<= -27.00)) ! field WD_wide_south_2
    case (select_by_sam)
       selected = (sam%mstars_disk+sam%mstars_bulge)/para%h>1e6
    case (select_by_pos_and_sam)
@@ -247,8 +252,46 @@ subroutine selection_waves_g23(pos,sam,sky,range,selected)
    case (select_by_all)
       selected = sky%mag<=24.0+dmag
    end select
-   
+  
 end subroutine
+
+! **********************************************************************************************************************************
+
+! WAVES-deep
+
+subroutine selection_waves_deep(pos,sam,sky,range,selected)
+
+   implicit none
+   type(type_spherical),intent(in),optional     :: pos
+   type(type_sam),intent(in),optional           :: sam
+   type(type_sky_galaxy),intent(in),optional    :: sky
+   type(type_fov),intent(inout),optional        :: range
+   logical,intent(inout),optional               :: selected
+   
+   ! computation variables
+   real*4            :: mag ! rough estimate of a apparent magnitude assuming M/L=1
+   real*4,parameter  :: dmag = 4.0 ! magnitude tolerance
+   
+   ! selection function
+   select case (selection_type(pos,sam,sky,range,selected))
+
+   case (return_position_range)
+      range%dc = (/0.0,3558.3432000000003/) ! [simulation length units, here Mpc/h] limit corresponding to z=2
+      range%ra = (/339,351/) ! [deg] range of right ascensions, bound to 0 to 360
+      range%dec = (/-35,-30/) ! [deg] range of declinations, bound to -90 to +90
+   case (select_by_pos)
+   case (select_by_sam)
+      selected = (sam%mstars_disk+sam%mstars_bulge)/para%h>1e6
+   case (select_by_pos_and_sam)
+      ! note: see comments in selection_gama
+      mag = convert_absmag2appmag(convert_stellarmass2absmag((sam%mstars_disk+sam%mstars_bulge)/para%h,1.0),pos%dc/para%h)
+      selected = mag<=26.0+dmag
+   case (select_by_all)
+      selected = sky%mag<=26.0+dmag
+   end select
+  
+end subroutine
+
 
 ! **********************************************************************************************************************************
 

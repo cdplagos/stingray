@@ -667,7 +667,7 @@ subroutine make_auto_parameters
    call set_auto_parameter('subvolume_max',isubvolume-1)
    
    ! other parameters
-   filename = filename_sam(snapshot_min,0,1)
+   filename = filename_sam(snapshot_max,0,1)
    call out('File of automatic parameters: '//trim(filename))
    call hdf5_open(filename)
    call hdf5_read_data('/cosmology/h',h); call set_auto_parameter('h',h)

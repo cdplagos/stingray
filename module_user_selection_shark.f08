@@ -141,7 +141,7 @@ subroutine selection_gama(pos,sam,sky,range,selected)
    real*4            :: mstars ! [Msun] stellar mass
    real*4            :: dl ! [Mpc] comoving distance
    real*4            :: mag ! generic apparent magnitude assuming M/L=1
-   real*4,parameter  :: dmag = 4.0 ! magnitude tolerance
+   real*4,parameter  :: dmag = 6.0 ! magnitude tolerance
    
    ! selection function
    select case (selection_type(pos,sam,sky,range,selected))
@@ -344,7 +344,7 @@ subroutine selection_deep_optical_narrow(pos,sam,sky,range,selected)
    ! selection function
    select case (selection_type(pos,sam,sky,range,selected))
    case (return_position_range)
-      range%dc = (/0.0,6173.688/) ! [simulation length units, here Mpc/h] (out to z=8)
+      range%dc = (/0.0, 9650.51/) ! [simulation length units, here Mpc/h] (out to z=10)
       range%ra = (/211.500,223.500/) ! [deg]
       range%dec = (/-2.5,2.5/) ! [deg]
    case (select_by_pos)

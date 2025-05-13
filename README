@@ -40,6 +40,9 @@ v0.37 11/12/2020: Fixed illegal tmp file names, added DSA-2000 as examples in sh
 v0.38 18/08/2022: New way of assigning unique galaxy IDs to avoid duplicated indices for duplicated galaxies; bug fix with zobs
 v0.39 21/10/2024: Relax requirement that each group must have exactly one central, to each group must have at most one central
 v0.40 21/10/2024: Updated makefile
+v0.41 02/05/2025: Fixed unwrapping issue and wrong group positions that occasionally occurred in "tiles" randomisation mode
+v0.42 06/05/2025: Changed filenames from *.f08 to *.f90, despite Fortran 2008 elements, to increase compatibility
+v0.43 09/05/2025: Improved makefile for Hyades compatibility, fixed typo in HDF5 attributes
 
 Developed by Danail Obreschkow (danail.obreschkow@icrar.org)
 
@@ -47,16 +50,15 @@ Developed by Danail Obreschkow (danail.obreschkow@icrar.org)
 GETTING STARTED
 =================================================================================================================================
 
-1) Prerequisites:
+1) Prerequisites. Depending on the system you may need to do some of the following:
    a) make sure gfortran is installed (code tested for GNU Fortran 9.3.0) and available;
       on some systems, it may be necessary to load the compiler using something like
       > module load gfortran
    b) make sure that HDF5 is installed (version 1.10.1 or higher) and available;
       on some systems, it may be necessary to load the library using something like
       > module load gfortran hdf5
-   c) set the environment variable HDF5_DIR to the directory containing the HDF5 module ($DF5_DIR/include and $HDF5_DIR}/lib),
-      e.g. use
-      > export HDF5_DIR=...
+   c) set the environment variables HDF5_INC and HDF5_LIB to the directories containing the HDF5 module, e.g.
+      > export HDF5_INC="/path/to/HDF5/inc"
 
 2) In terminal, download Stingray
    > git clone https://github.com/obreschkow/stingray
@@ -81,7 +83,7 @@ GETTING STARTED
    NB: This command assumes the default parameter file "parameters.txt" to be in the current directory.
        Otherwise you must specify the path+filename of the parameter file using the option -parameterfile ...
        
-The command above should produce a sky containing 502 galaxies in 488 groups. These data is written in the directory "example".
+The command above should produce a sky containing 500 galaxies in 486 groups. These data is written in the directory "example".
 
 To produce your own, custom-made mock sky,
 
@@ -100,11 +102,13 @@ QUICK START ON ICRAR-HYADES
 
 # To install and compile stingray in your home directory, run the following code in the remote terminal:
 cd ~
+export HDF5_INC="/usr/include/hdf5/serial"
+export HDF5_LIB="/usr/lib/x86_64-linux-gnu/hdf5/serial"
 rm -rf stingray/ # remove previous surfsuite directory
 git clone https://github.com/obreschkow/stingray # install updated version
 cd stingray # change to surfsuite directory
-module load gfortran hdf5 # load required modules
-make system=hyades # compile code
+find . -exec touch {} \; #update timestamps to avoid occasional syncing warnings
+make # compile code
 
 # Verify stingray installation and version
 ./stingray version
@@ -112,7 +116,7 @@ make system=hyades # compile code
 # To run a quick test execute the following line (still from within the stingray directory):
 ./stingray
 
-# The sky should contain 502 galaxies in 488 groups. These data are written in the directory "example".
+# The sky should contain 500 galaxies in 486 groups. These data are written in the directory "example".
 # Do *not* keep executing stingray this way, but submit a job to the workload manager.
 
 
@@ -135,7 +139,7 @@ make # compile code
 # To run a quick test execute the following line (still from within the stingray directory):
 ./stingray
 
-# The sky should contain 502 galaxies in 488 groups. These data are written in the directory "example".
+# The sky should contain 500 galaxies in 486 groups. These data are written in the directory "example".
 # Do *not* keep executing stingray this way, but submit a job to the workload manager.
 
 

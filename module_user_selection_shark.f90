@@ -115,7 +115,7 @@ subroutine selection_example(pos,sam,sky,range,selected)
       ! here add additional, maximal restrictions that require apparent sky properties (sky), as defined in module_user_routines,
       ! possibly combined with position and SAM properties;
       ! if no such restrictions exist, leave this clause empty
-      selected = sky%mag<19.23 .and. sky%zobs<0.1 ! select by apparent magnitude and redshift
+      selected = sky%mag<19.24 .and. sky%zobs<0.1 ! select by apparent magnitude and redshift
       
    end select
    
@@ -432,6 +432,7 @@ subroutine selection_wallaby(dcmin,dcmax,pos,sam,sky,range,selected)
       mhi = (sam%matom_disk+sam%matom_bulge)/para%h/1.35 ! [Msun] HI mass
       selected = mhi>wallaby_fmin*(pos%dc/para%h)**2 ! rough preselection to accelerate computation
    case (select_by_all)
+      if (.not.option('line_shapes')) call error('selection function requires option line_shapes to be TRUE')
       mhi = (sam%matom_disk+sam%matom_bulge)/para%h/1.35
       da = sky%dc/(1+sky%zobs)/para%h*1e3 ! [kpc]
       dhi = 10.0**(0.506*log10(mhi)-3.293)/da/unit%arcsec ! [arcsec] 

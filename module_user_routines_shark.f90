@@ -440,7 +440,7 @@ subroutine make_sky_galaxy(sky_galaxy,sam,base)
    ! option "line_shapes"
    if (option('line_shapes')) then
       ! shape parameters of atomic and molecular emission lines
-      call make_line_profiles 
+      call make_line_profiles
    end if
    
 contains
@@ -543,7 +543,7 @@ subroutine make_sky_group(sky_group,sam,sky_galaxy,selected,base,groupflag)
                                                          ! selection of the mock sky, as defined in the user module
                                                          ! module_user_selection_[...]
    type(type_base),intent(in)          :: base           ! basic properties (see details in subroutine make_sky_object)
-   integer*4                           :: groupflag      ! indicates of the group is clipped: 0 if group unclipped, >0 if clipped by
+   integer*4,intent(in)                :: groupflag      ! indicates of the group is clipped: 0 if group unclipped, >0 if clipped by
                                                          ! + survey edge (+1)
                                                          ! + snapshot limit (+2)
                                                          ! + tile limit (+4)
